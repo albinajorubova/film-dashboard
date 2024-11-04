@@ -69,6 +69,6 @@ input,
 button,
 textarea,
 select {
-  font: inherit;
+  font-family: "Montserrat", sans-serif;
   border: none;
 }
