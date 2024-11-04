@@ -16,9 +16,6 @@ const FilmItem = () => {
         <p className={s.gener}>
           gener: <span className={s.span}>text</span>
         </p>
-        <p className={s.gener}>
-          gener: <span className={s.span}>text</span>
-        </p>
       </div>
       <div className={s.buttonView}>
         <ButtonView />
