@@ -8,9 +8,6 @@ const FilmList = () => {
   return (
     <div className={s.block}>
       <FilmItem />
-      <FilmItem />
-      <FilmItem />
-      <FilmItem />
     </div>
   );
 };

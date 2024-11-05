@@ -40,7 +40,7 @@
   border-radius: 10px;
   cursor: pointer;
 
-  &:active {
-    background-color: rgba($color: #ddd9d0, $alpha: 1);
+  &:hover {
+    color: #1b1212;
   }
 }
