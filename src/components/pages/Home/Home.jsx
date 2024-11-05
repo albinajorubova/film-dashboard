@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 import s from "./Home.module.scss";
 
@@ -9,16 +9,15 @@ import Form from "../../common/Form/Form";
 
 const Home = () => {
   const [modalActive, setModalActive] = useState(false);
+  const openModal = useCallback(() => {
+    setModalActive(true);
+  }, []);
+
   return (
     <div className={s.home}>
       <h1 className={s.titile}>Film Dashboard</h1>
       <div className={s.block}>
-        <Button
-          value={"Add"}
-          btnFunc={() => {
-            setModalActive(true);
-          }}
-        />
+        <Button type={"button"} value={"Add"} btnFunc={openModal} />
       </div>
       <FilmList />
       <Modal
@@ -27,7 +26,7 @@ const Home = () => {
         closeModal={() => {
           setModalActive(false);
         }}
-        content={<Form />}
+        content={<Form closeModal={() => setModalActive(false)} />}
       />
     </div>
   );
