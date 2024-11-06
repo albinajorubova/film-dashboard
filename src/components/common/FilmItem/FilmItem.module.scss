@@ -11,7 +11,8 @@
   border-radius: 10px;
 }
 
-.image {
+.image,
+.errorText {
   width: 100%;
   height: 200px;
   object-fit: cover;

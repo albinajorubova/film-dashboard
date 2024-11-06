@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 
 import { useForm } from "react-hook-form";
 
@@ -59,11 +59,6 @@ const Form = ({ closeModal }) => {
             message: "Year cannot be in the future",
           },
         },
-        inputProps: {
-          min: 1888,
-          max: new Date().getFullYear(),
-          step: 1,
-        },
       },
       {
         label: "Director",
@@ -74,7 +69,7 @@ const Form = ({ closeModal }) => {
           required: { value: true, message: "Enter the director's name" },
           minLength: { value: 3, message: "Minimum 3 characters" },
           pattern: {
-            value: /^[A-Za-z\s]+$/,
+            value: /^[A-Za-zА-Яа-я\s]+$/,
             message: "Only letters and spaces are allowed",
           },
         },
@@ -89,21 +84,49 @@ const Form = ({ closeModal }) => {
           minLength: { value: 10, message: "Minimum 10 characters" },
         },
       },
+      {
+        label: "Photo",
+        type: "file",
+        placeholder: "",
+        required: true,
+        validationRules: {
+          required: { value: true, message: "Please upload a photo" },
+          fileType: {
+            value: ["image/jpeg", "image/png"],
+            message: "Only JPG or PNG files are allowed",
+          },
+        },
+      },
     ],
     []
   );
 
+  const [photo, setPhoto] = useState(null);
+
   const onSubmit = (data) => {
-    const existingData = localStorage.getItem("filmData");
-    const filmData = existingData ? JSON.parse(existingData) : [];
-    filmData.push(data);
-    localStorage.setItem("filmData", JSON.stringify(filmData));
+    const photoData = {
+      ...data,
+      photo: photo,
+    };
+
+    const filmData = localStorage.getItem("filmData");
+    const storedFilms = filmData ? JSON.parse(filmData) : [];
+    storedFilms.push(photoData);
+    localStorage.setItem("filmData", JSON.stringify(storedFilms));
+    window.location.reload();
     reset();
     closeModal();
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    const urlImage = URL.createObjectURL(file);
+    setPhoto(urlImage);
+  };
+
   const handleReset = useCallback(() => {
     reset();
+    setPhoto(null);
   }, [reset]);
 
   return (
@@ -116,12 +139,10 @@ const Form = ({ closeModal }) => {
             {...field}
             register={register}
             errors={errors}
+            onChange={field.type === "file" ? handleFileChange : undefined}
+            photo={photo}
           />
         ))}
-        <div className={s.photoBtn}>
-          <label className={s.label}>Add Photo</label>
-          <Button type={"button"} value={"Add"} />
-        </div>
       </div>
       <div className={s.btnsBlock}>
         <Button type={"submit"} value={"Save"} />

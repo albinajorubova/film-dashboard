@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import cx from "classnames";
 import PropTypes from "prop-types";
 
 import s from "./Input.module.scss";
+import Button from "../../Button/Button";
 
 const Input = ({
   label,
@@ -14,9 +15,16 @@ const Input = ({
   validationRules = {},
   errors,
   inputProps,
+  onChange,
+  photo,
 }) => {
   const inputId = `input-${label.replace(/\s+/g, "-").toLowerCase()}`;
   const error = errors?.[label]?.message;
+  const inputFileRef = useRef(null);
+
+  const handleFileClick = () => {
+    inputFileRef.current?.click();
+  };
 
   if (type === "textarea") {
     return (
@@ -31,6 +39,25 @@ const Input = ({
           placeholder={placeholder}
           {...register(label, { required, ...validationRules })}
         />
+      </div>
+    );
+  }
+
+  if (type === "file") {
+    return (
+      <div className={s.photoBtn}>
+        <label className={s.label}>Upload image</label>
+        <input
+          id={inputId}
+          className={s.file}
+          placeholder={placeholder}
+          ref={inputFileRef}
+          type="file"
+          accept="image/*"
+          onChange={onChange}
+        />
+        <Button btnFunc={handleFileClick} type={"button"} value={"Add"} />
+        <img src={photo} className={s.image} />
       </div>
     );
   }
@@ -87,6 +114,7 @@ Input.propTypes = {
   register: PropTypes.func.isRequired,
   required: PropTypes.bool,
   control: PropTypes.object,
+  onChange: PropTypes.func,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,

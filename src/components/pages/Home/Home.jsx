@@ -3,7 +3,7 @@ import React, { useState, useCallback } from "react";
 import s from "./Home.module.scss";
 
 import Button from "../../common/Button/Button";
-import FilmList from "../../common/FilmList/FilmList";
+import FilmItem from "../../common/FilmItem/FilmItem";
 import Modal from "../../common/Modal/Modal";
 import Form from "../../common/Form/Form";
 
@@ -19,7 +19,9 @@ const Home = () => {
       <div className={s.block}>
         <Button type={"button"} value={"Add"} btnFunc={openModal} />
       </div>
-      <FilmList />
+      <div className={s.list}>
+        <FilmItem />
+      </div>
       <Modal
         active={modalActive}
         setActive={setModalActive}

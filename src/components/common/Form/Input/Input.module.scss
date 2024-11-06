@@ -52,6 +52,8 @@
     background-image: url("../../../../img/form_input.svg");
     background-repeat: no-repeat;
     background-position: center;
+    pointer-events: none;
+    cursor: pointer;
   }
 }
 
@@ -82,4 +84,24 @@
 .errorText {
   font-size: 10px;
   color: rgb(219, 128, 128);
+}
+
+.file {
+  display: none;
+}
+
+.photoBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image {
+  display: block;
+  margin-top: 10px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: center;
+  border: none;
 }
