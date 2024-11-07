@@ -1,6 +1,8 @@
 import React, { useMemo, useCallback, useState } from "react";
 
 import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import s from "./Form.module.scss";
 
@@ -8,12 +10,42 @@ import Input from "./Input/Input";
 import Button from "../Button/Button";
 
 const Form = ({ closeModal }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm();
+  const SCHEMA = yup.object().shape({
+    Title: yup
+      .string()
+      .required("Enter the title")
+      .min(1, "Minimum 1 character"),
+    Genre: yup
+      .string()
+      .required("Please select a genre")
+      .notOneOf([""], "Genre not selected"),
+    Year: yup
+      .number()
+      .transform((value, originalValue) =>
+        originalValue.trim() === "" ? undefined : value
+      )
+      .required("Please specify the year")
+      .min(1888, "Year cannot be earlier than 1888")
+      .max(new Date().getFullYear(), "Year cannot be in the future"),
+    Director: yup
+      .string()
+      .required("Enter the director's name")
+      .min(3, "Minimum 3 characters")
+      .matches(/^[A-Za-zА-Яа-я\s]+$/, "Only letters and spaces are allowed"),
+    Description: yup
+      .string()
+      .required("Enter a description")
+      .min(10, "Minimum 10 characters"),
+    Photo: yup
+      .mixed()
+      .required("You need to provide a file")
+      .test("fileSize", "File is too large", (value) => {
+        return value && value[0] && value[0].size <= 20000000;
+      })
+      .test("fileType", "Only JPG or PNG files are allowed", (value) => {
+        return value && ["image/jpeg", "image/png"].includes(value[0]?.type);
+      }),
+  });
 
   const DATA = useMemo(
     () => [
@@ -21,11 +53,6 @@ const Form = ({ closeModal }) => {
         label: "Title",
         type: "text",
         placeholder: "Enter the movie title",
-        required: true,
-        validationRules: {
-          required: { value: true, message: "Enter the title" },
-          minLength: { value: 1, message: "Minimum 1 character" },
-        },
       },
       {
         label: "Genre",
@@ -40,66 +67,40 @@ const Form = ({ closeModal }) => {
           { value: "Thriller", label: "Thriller" },
           { value: "Detective", label: "Detective" },
         ],
-        required: true,
-        validationRules: {
-          required: { value: true, message: "Please select a genre" },
-          validate: (value) => value !== "" || "Genre not selected",
-        },
       },
       {
         label: "Year",
         type: "number",
         placeholder: "Enter the year",
-        required: true,
-        validationRules: {
-          required: { value: true, message: "Please specify the year" },
-          min: { value: 1888, message: "Year cannot be earlier than 1888" },
-          max: {
-            value: new Date().getFullYear(),
-            message: "Year cannot be in the future",
-          },
-        },
       },
       {
         label: "Director",
         type: "text",
         placeholder: "Enter the director's name",
-        required: true,
-        validationRules: {
-          required: { value: true, message: "Enter the director's name" },
-          minLength: { value: 3, message: "Minimum 3 characters" },
-          pattern: {
-            value: /^[A-Za-zА-Яа-я\s]+$/,
-            message: "Only letters and spaces are allowed",
-          },
-        },
       },
       {
         label: "Description",
         type: "textarea",
         placeholder: "Enter the movie description",
-        required: true,
-        validationRules: {
-          required: { value: true, message: "Enter a description" },
-          minLength: { value: 10, message: "Minimum 10 characters" },
-        },
       },
       {
         label: "Photo",
         type: "file",
-        placeholder: "",
-        required: true,
-        validationRules: {
-          required: { value: true, message: "Please upload a photo" },
-          fileType: {
-            value: ["image/jpeg", "image/png"],
-            message: "Only JPG or PNG files are allowed",
-          },
-        },
       },
     ],
     []
   );
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    setError,
+  } = useForm({
+    resolver: yupResolver(SCHEMA),
+  });
 
   const [photo, setPhoto] = useState(null);
 
@@ -118,11 +119,21 @@ const Form = ({ closeModal }) => {
     closeModal();
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    const urlImage = URL.createObjectURL(file);
-    setPhoto(urlImage);
-  };
+  const handleFileChange = useCallback(
+    (event) => {
+      const file = event.target.files[0];
+      setValue("Photo", event.target.files);
+
+      SCHEMA.validateAt("Photo", { Photo: event.target.files })
+        .then(() => {
+          setPhoto(URL.createObjectURL(file));
+        })
+        .catch((err) => {
+          setError("Photo", { type: "manual", message: err.message });
+        });
+    },
+    [setValue, setPhoto, setError]
+  );
 
   const handleReset = useCallback(() => {
     reset();

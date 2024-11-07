@@ -3,6 +3,7 @@ import cx from "classnames";
 import PropTypes from "prop-types";
 
 import s from "./Input.module.scss";
+
 import Button from "../../Button/Button";
 
 const Input = ({
@@ -46,7 +47,10 @@ const Input = ({
   if (type === "file") {
     return (
       <div className={s.photoBtn}>
-        <label className={s.label}>Upload image</label>
+        <label className={s.label}>
+          Upload image
+          {error && <p className={s.errorText}>({error})*</p>}
+        </label>
         <input
           id={inputId}
           className={s.file}
@@ -55,9 +59,18 @@ const Input = ({
           type="file"
           accept="image/*"
           onChange={onChange}
+          name={label}
         />
-        <Button btnFunc={handleFileClick} type={"button"} value={"Add"} />
-        <img src={photo} className={s.image} />
+        <Button
+          btnFunc={handleFileClick}
+          type={"button"}
+          value={photo ? "Change" : "Add"}
+        />
+        <div className={s.phtotBlock}>
+          {photo && (
+            <img src={photo} className={s.image} alt="Uploaded preview" />
+          )}
+        </div>
       </div>
     );
   }
@@ -113,8 +126,6 @@ Input.propTypes = {
   placeholder: PropTypes.string,
   register: PropTypes.func.isRequired,
   required: PropTypes.bool,
-  control: PropTypes.object,
-  onChange: PropTypes.func,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,
@@ -123,6 +134,9 @@ Input.propTypes = {
   ),
   validationRules: PropTypes.object,
   errors: PropTypes.object,
+  onChange: PropTypes.func,
+  photo: PropTypes.string,
+  inputProps: PropTypes.object,
 };
 
 export default Input;
