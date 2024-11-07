@@ -13,6 +13,10 @@ const Home = () => {
     setModalActive(true);
   }, []);
 
+  const closeModal = useCallback(() => {
+    setModalActive(false);
+  }, []);
+
   return (
     <div className={s.home}>
       <h1 className={s.titile}>Film Dashboard</h1>
@@ -25,10 +29,8 @@ const Home = () => {
       <Modal
         active={modalActive}
         setActive={setModalActive}
-        closeModal={() => {
-          setModalActive(false);
-        }}
-        content={<Form closeModal={() => setModalActive(false)} />}
+        closeModal={closeModal}
+        content={<Form closeModal={closeModal} />}
       />
     </div>
   );

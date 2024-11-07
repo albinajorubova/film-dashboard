@@ -1,9 +1,9 @@
-import React from "react";
+import React, { memo } from "react";
 import cx from "classnames";
 
 import s from "./Modal.module.scss";
 
-const Modal = ({ content, active, setActive, closeModal }) => {
+const Modal = memo(({ content, active, setActive, closeModal }) => {
   return (
     <div
       className={cx(s.modal, { [s.active]: active })}
@@ -20,6 +20,6 @@ const Modal = ({ content, active, setActive, closeModal }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Modal;
