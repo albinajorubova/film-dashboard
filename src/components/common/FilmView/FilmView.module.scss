@@ -1,0 +1,39 @@
+.block {
+  display: flex;
+  justify-content: space-between;
+  gap: 70px;
+  width: 100%;
+}
+
+.img {
+  display: block;
+  width: 40%;
+  height: auto;
+  object-fit: cover;
+  object-position: center;
+  border: none;
+}
+
+.prop {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3d3d3f;
+  text-align: start;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #555557;
+  white-space: pre-wrap;
+}
+
+.text {
+  display: flex;
+  flex: 0 0 60%;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  white-space: pre;
+}

@@ -19,7 +19,8 @@
   object-position: center;
 }
 
-.data {
+.data,
+.noFilms {
   font-size: 24px;
   font-weight: 700;
   color: #3d3d3f;
@@ -59,4 +60,8 @@
   &:active {
     background-image: url("../../../img/eyeOpen.svg");
   }
+}
+
+.openEye {
+  background-image: url("../../../img/eyeOpen.svg");
 }
