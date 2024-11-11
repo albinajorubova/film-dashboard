@@ -1,6 +1,7 @@
 .block {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 70px;
   width: 100%;
 }
@@ -30,10 +31,12 @@
 
 .text {
   display: flex;
-  flex: 0 0 60%;
+  flex: 0 0 55%;
   flex-direction: column-reverse;
   justify-content: center;
   align-items: flex-start;
   gap: 10px;
   white-space: pre;
+  word-wrap: break-word;
+  word-break: break-word;
 }

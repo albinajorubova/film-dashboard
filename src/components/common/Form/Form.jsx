@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -9,88 +9,82 @@ import s from "./Form.module.scss";
 import Input from "./Input/Input";
 import Button from "../Button/Button";
 
-const Form = ({ closeModal }) => {
-  const SCHEMA = yup.object().shape({
-    Title: yup
-      .string()
-      .required("Enter the title")
-      .min(1, "Minimum 1 character"),
-    Genre: yup
-      .string()
-      .required("Please select a genre")
-      .notOneOf([""], "Genre not selected"),
-    Year: yup
-      .number()
-      .transform((value, originalValue) =>
-        originalValue.trim() === "" ? undefined : value
-      )
-      .required("Please specify the year")
-      .min(1888, "Year cannot be earlier than 1888")
-      .max(new Date().getFullYear(), "Year cannot be in the future"),
-    Director: yup
-      .string()
-      .required("Enter the director's name")
-      .min(3, "Minimum 3 characters")
-      .matches(/^[A-Za-zА-Яа-я\s]+$/, "Only letters and spaces are allowed"),
-    Description: yup
-      .string()
-      .required("Enter a description")
-      .min(10, "Minimum 10 characters"),
-    Photo: yup
-      .mixed()
-      .required("You need to provide a file")
-      .test("fileSize", "File is too large", (value) => {
-        return value && value[0] && value[0].size <= 20000000;
-      })
-      .test("fileType", "Only JPG or PNG files are allowed", (value) => {
-        return value && ["image/jpeg", "image/png"].includes(value[0]?.type);
-      }),
-  });
-
-  const DATA = useMemo(
-    () => [
-      {
-        label: "Title",
-        type: "text",
-        placeholder: "Enter the movie title",
-      },
-      {
-        label: "Genre",
-        type: "select",
-        options: [
-          { value: "", label: "Select genre", isPlaceholder: true },
-          { value: "Comedy", label: "Comedy" },
-          { value: "Drama", label: "Drama" },
-          { value: "Fantasy", label: "Fantasy" },
-          { value: "Action", label: "Action" },
-          { value: "Horror", label: "Horror" },
-          { value: "Thriller", label: "Thriller" },
-          { value: "Detective", label: "Detective" },
-        ],
-      },
-      {
-        label: "Year",
-        type: "number",
-        placeholder: "Enter the year",
-      },
-      {
-        label: "Director",
-        type: "text",
-        placeholder: "Enter the director's name",
-      },
-      {
-        label: "Description",
-        type: "textarea",
-        placeholder: "Enter the movie description",
-      },
-      {
-        label: "Photo",
-        type: "file",
-      },
+const DATA = [
+  {
+    label: "Title",
+    type: "text",
+    placeholder: "Enter the movie title",
+  },
+  {
+    label: "Genre",
+    type: "select",
+    options: [
+      { value: "", label: "Select genre", isPlaceholder: true },
+      { value: "Comedy", label: "Comedy" },
+      { value: "Drama", label: "Drama" },
+      { value: "Fantasy", label: "Fantasy" },
+      { value: "Action", label: "Action" },
+      { value: "Horror", label: "Horror" },
+      { value: "Thriller", label: "Thriller" },
+      { value: "Detective", label: "Detective" },
     ],
-    []
-  );
+  },
+  {
+    label: "Year",
+    type: "number",
+    placeholder: "Enter the year",
+  },
+  {
+    label: "Director",
+    type: "text",
+    placeholder: "Enter the director's name",
+  },
+  {
+    label: "Description",
+    type: "textarea",
+    placeholder: "Enter the movie description",
+  },
+  {
+    label: "Photo",
+    type: "file",
+  },
+];
 
+const SCHEMA = yup.object().shape({
+  Title: yup.string().required("Enter the title").min(1, "Minimum 1 character"),
+  Genre: yup
+    .string()
+    .required("Please select a genre")
+    .notOneOf([""], "Genre not selected"),
+  Year: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue.trim() === "" ? undefined : value
+    )
+    .required("Please specify the year")
+    .min(1888, "Year cannot be earlier than 1888")
+    .max(new Date().getFullYear(), "Year cannot be in the future"),
+  Director: yup
+    .string()
+    .required("Enter the director's name")
+    .min(3, "Minimum 3 characters")
+    .matches(/^[A-Za-zА-Яа-я\s]+$/, "Only letters and spaces are allowed"),
+  Description: yup
+    .string()
+    .required("Enter a description")
+    .min(10, "Minimum 10 characters"),
+  Photo: yup
+    .mixed()
+    .required("You need to provide a file")
+    .test("fileSize", "File is too large", (value) => {
+      return value && value[0] && value[0].size <= 2000000;
+    })
+    .test("fileType", "Only JPG or PNG files are allowed", (value) => {
+      return value && ["image/jpeg", "image/png"].includes(value[0]?.type);
+    }),
+});
+
+const Form = ({ closeModal }) => {
   const {
     register,
     handleSubmit,
@@ -120,13 +114,21 @@ const Form = ({ closeModal }) => {
   };
 
   const handleFileChange = useCallback(
-    (event) => {
+    async (event) => {
       const file = event.target.files[0];
       setValue("Photo", event.target.files);
 
-      SCHEMA.validateAt("Photo", { Photo: event.target.files })
-        .then(() => {
-          setPhoto(URL.createObjectURL(file));
+      try {
+        await SCHEMA.validateAt("Photo", { Photo: event.target.files });
+      } catch (err) {
+        setError("Photo", { type: "manual", message: err.message });
+        return;
+      }
+
+      getBase64(file)
+        .then((base64) => {
+          localStorage.setItem("fileBase64", base64);
+          setPhoto(base64);
         })
         .catch((err) => {
           setError("Photo", { type: "manual", message: err.message });
@@ -135,9 +137,19 @@ const Form = ({ closeModal }) => {
     [setValue, setPhoto, setError]
   );
 
+  const getBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleReset = useCallback(() => {
     reset();
     setPhoto(null);
+    localStorage.removeItem("fileBase64");
   }, [reset]);
 
   return (
