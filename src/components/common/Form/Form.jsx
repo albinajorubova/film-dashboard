@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import PropTypes from "prop-types";
 
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -153,7 +154,7 @@ const Form = ({ closeModal }) => {
   }, [reset]);
 
   return (
-    <form className={s.form} onSubmit={handleSubmit(onSubmit)}>
+    <form className={s.root} onSubmit={handleSubmit(onSubmit)}>
       <h1 className={s.titleForm}>Add Film</h1>
       <div className={s.block}>
         {DATA.map((field) => (
@@ -168,11 +169,15 @@ const Form = ({ closeModal }) => {
         ))}
       </div>
       <div className={s.btnsBlock}>
-        <Button type={"submit"} value={"Save"} />
-        <Button type={"reset"} value={"Reset"} onClick={handleReset} />
+        <Button type="submit" value="Save" />
+        <Button type="reset" value="Reset" onClick={handleReset} />
       </div>
     </form>
   );
+};
+
+Form.propTypes = {
+  closeModal: PropTypes.func.isRequired,
 };
 
 export default Form;

@@ -1,4 +1,4 @@
-.button {
+.root {
   width: 135px;
   height: 37px;
   padding: 5px 10px;
@@ -19,8 +19,8 @@
   }
 }
 
-.submit,
-.reset {
+button[type="submit"],
+button[type="reset"] {
   background-color: #3d3d3f;
   color: #f9f7f4;
   &:active,

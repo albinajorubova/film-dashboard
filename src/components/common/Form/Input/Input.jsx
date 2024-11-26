@@ -29,7 +29,7 @@ const Input = ({
 
   if (type === "textarea") {
     return (
-      <div className={s.block}>
+      <div className={s.root}>
         <label htmlFor={inputId} className={s.label}>
           {label}
           {error && <p className={s.errorText}>({error})*</p>}
@@ -46,7 +46,7 @@ const Input = ({
 
   if (type === "file") {
     return (
-      <div className={s.photoBtn}>
+      <div className={s.root}>
         <label className={s.label}>
           Upload image
           {error && <p className={s.errorText}>({error})*</p>}
@@ -63,7 +63,7 @@ const Input = ({
         />
         <Button
           btnFunc={handleFileClick}
-          type={"button"}
+          type="button"
           value={photo ? "Change" : "Add"}
         />
         <div className={s.phtotBlock}>
@@ -77,7 +77,7 @@ const Input = ({
 
   if (type === "select") {
     return (
-      <div className={cx(s.block, s.arrow)}>
+      <div className={cx(s.root, s.arrow)}>
         <label htmlFor={inputId} className={s.label}>
           {label}
           {error && <p className={s.errorText}>({error})*</p>}
@@ -92,7 +92,7 @@ const Input = ({
             <option
               key={option.value}
               value={option.value}
-              className={option.isPlaceholder ? s.hide : undefined}
+              className={cx({ [s.hide]: option.isPlaceholder })}
             >
               {option.label}
             </option>
@@ -103,7 +103,7 @@ const Input = ({
   }
 
   return (
-    <div className={s.block}>
+    <div className={s.root}>
       <label htmlFor={inputId} className={s.label}>
         {label}
         {error && <p className={s.errorText}>({error})*</p>}
@@ -111,7 +111,7 @@ const Input = ({
       <input
         id={inputId}
         type={type}
-        className={`${s.input} ${error ? s.error : ""}`}
+        className={cx(s.input, { [s.error]: error })}
         placeholder={placeholder}
         {...register(label, { required, ...validationRules })}
         {...inputProps}

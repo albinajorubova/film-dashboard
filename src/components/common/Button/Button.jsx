@@ -1,22 +1,20 @@
 import React from "react";
-
-import cx from "classnames";
+import PropTypes from "prop-types";
 
 import s from "./Button.module.scss";
 
 const Button = ({ value, btnFunc, type }) => {
   return (
-    <button
-      className={cx(s.button, {
-        [s.submit]: type === "submit",
-        [s.reset]: type === "reset",
-      })}
-      onClick={btnFunc}
-      type={type}
-    >
+    <button className={s.root} onClick={btnFunc} type={type}>
       {value}
     </button>
   );
+};
+
+Button.propTypes = {
+  value: PropTypes.string.isRequired,
+  btnFunc: PropTypes.func,
+  type: PropTypes.oneOf(["button", "submit", "reset"]),
 };
 
 export default Button;

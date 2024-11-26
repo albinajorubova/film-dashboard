@@ -2,7 +2,7 @@
   display: none;
 }
 
-.block {
+.root {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -49,7 +49,7 @@
     display: block;
     width: 26px;
     height: 26px;
-    background-image: url("../../../../img/form_input.svg");
+    background-image: url("/images/form_input.svg");
     background-repeat: no-repeat;
     background-position: center;
     pointer-events: none;
@@ -88,12 +88,6 @@
 
 .file {
   display: none;
-}
-
-.photoBtn {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .phtotBlock {
