@@ -1,0 +1,25 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 3% 5%;
+  .titile {
+    margin: 0;
+    font-size: 44px;
+    color: #3d3d3f;
+    text-align: center;
+  }
+}
+
+.block {
+  align-self: flex-start;
+  gap: 40px;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 400px);
+  justify-content: space-between;
+  flex-flow: wrap;
+  gap: 30px;
+}

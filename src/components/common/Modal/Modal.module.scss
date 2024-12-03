@@ -1,0 +1,46 @@
+.root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  transform: scale(0);
+  &.active {
+    transform: scale(1);
+  }
+}
+
+.content {
+  position: relative;
+  padding: 3% 5% 5% 5%;
+  width: 50%;
+  background-color: #ddd9d0;
+  border-radius: 10px;
+  transform: scale(0);
+  transition: transform 0.3s ease;
+  &.active {
+    transform: scale(1);
+    transition: transform 0.3s ease;
+  }
+}
+
+.button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px 15px;
+  color: #3d3d3f;
+  background-color: transparent;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: #1b1212;
+  }
+}
