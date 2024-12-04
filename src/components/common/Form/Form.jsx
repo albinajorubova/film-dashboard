@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import { useForm } from "react-hook-form";
@@ -59,9 +59,9 @@ const SCHEMA = yup.object().shape({
     .notOneOf([""], "Genre not selected"),
   Year: yup
     .number()
-    .transform((value, originalValue) =>
-      originalValue.trim() === "" ? undefined : value
-    )
+    .transform((value, originalValue) => {
+      return originalValue === "" ? undefined : Number(originalValue);
+    })
     .required("Please specify the year")
     .min(1888, "Year cannot be earlier than 1888")
     .max(new Date().getFullYear(), "Year cannot be in the future"),
@@ -85,7 +85,7 @@ const SCHEMA = yup.object().shape({
     }),
 });
 
-const Form = ({ closeModal }) => {
+const Form = ({ closeModal, film, titile, index }) => {
   const {
     register,
     handleSubmit,
@@ -99,6 +99,20 @@ const Form = ({ closeModal }) => {
 
   const [photo, setPhoto] = useState(null);
 
+  useEffect(() => {
+    if (film) {
+      reset({
+        Title: film.Title || "",
+        Genre: film.Genre || "",
+        Year: film.Year || "",
+        Director: film.Director || "",
+        Description: film.Description || "",
+      });
+      setPhoto(film.photo || null);
+      setValue("Photo", film.photo || null);
+    }
+  }, [film, reset, setValue]);
+
   const onSubmit = (data) => {
     const photoData = {
       ...data,
@@ -107,7 +121,13 @@ const Form = ({ closeModal }) => {
 
     const filmData = localStorage.getItem("filmData");
     const storedFilms = filmData ? JSON.parse(filmData) : [];
-    storedFilms.push(photoData);
+
+    if (film) {
+      storedFilms[index] = { ...storedFilms[index], ...photoData };
+    } else {
+      storedFilms.push(photoData);
+    }
+
     localStorage.setItem("filmData", JSON.stringify(storedFilms));
     window.location.reload();
     reset();
@@ -153,9 +173,18 @@ const Form = ({ closeModal }) => {
     localStorage.removeItem("fileBase64");
   }, [reset]);
 
+  const handleDelete = useCallback(() => {
+    const filmData = localStorage.getItem("filmData");
+    const storedFilms = filmData ? JSON.parse(filmData) : [];
+    const updatedFilms = storedFilms.filter((_, idx) => idx !== index);
+    localStorage.setItem("filmData", JSON.stringify(updatedFilms));
+    closeModal();
+    window.location.reload();
+  }, [closeModal, index]);
+
   return (
     <form className={s.root} onSubmit={handleSubmit(onSubmit)}>
-      <h1 className={s.titleForm}>Add Film</h1>
+      <h1 className={s.titleForm}>{titile}</h1>
       <div className={s.block}>
         {DATA.map((field) => (
           <Input
@@ -169,8 +198,12 @@ const Form = ({ closeModal }) => {
         ))}
       </div>
       <div className={s.btnsBlock}>
-        <Button type="submit" value="Save" />
-        <Button type="reset" value="Reset" onClick={handleReset} />
+        <Button type={"submit"} value={"Save"} />
+        {film ? (
+          <Button type={"reset"} value={"Delete"} btnFunc={handleDelete} />
+        ) : (
+          <Button type={"reset"} value={"Reset"} btnFunc={handleReset} />
+        )}
       </div>
     </form>
   );

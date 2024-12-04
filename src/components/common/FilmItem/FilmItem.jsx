@@ -1,11 +1,13 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
-import cx from "classnames";
 
 import s from "./FilmItem.module.scss";
 
-const FilmItem = memo(({ film, onClick, isSelected }) => {
+import IconBtn from "../IconBtn/IconBtn";
+
+const FilmItem = memo(({ film, onClick, isSelected, modalType, index }) => {
   const { Title, Year, Genre, photo } = film;
+
   return (
     <div className={s.root}>
       <img src={photo} alt={Title} className={s.image} />
@@ -19,12 +21,16 @@ const FilmItem = memo(({ film, onClick, isSelected }) => {
         </p>
       </div>
 
-      <div className={s.buttonView}>
-        <button
-          onClick={() => onClick(film)}
-          className={cx(s.button, {
-            [s.openEye]: isSelected,
-          })}
+      <div className={s.iconBtns}>
+        <IconBtn
+          onClick={() => onClick(film, "view", index)}
+          isActive={modalType === "view" && isSelected === index}
+          ClassName="Eye"
+        />
+        <IconBtn
+          onClick={() => onClick(film, "edit", index)}
+          isActive={modalType === "edit" && isSelected === index}
+          ClassName="Edit"
         />
       </div>
     </div>
@@ -39,7 +45,8 @@ FilmItem.propTypes = {
     Genre: PropTypes.string.isRequired,
   }).isRequired,
   onClick: PropTypes.func.isRequired,
-  isSelected: PropTypes.bool.isRequired,
+  isSelected: PropTypes.number,
+  modalType: PropTypes.string,
 };
 
 export default FilmItem;
