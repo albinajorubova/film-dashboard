@@ -76,11 +76,16 @@ const SCHEMA = yup.object().shape({
     .min(10, "Minimum 10 characters"),
   Photo: yup
     .mixed()
-    .required("You need to provide a file")
-    .test("fileSize", "File is too large", (value) => {
+    .test("fileRequired", "You need to provide a file", (value, context) => {
+      if (context.parent.isEditing) return true;
+      return value && value.length > 0;
+    })
+    .test("fileSize", "File is too large", (value, context) => {
+      if (context.parent.isEditing) return true;
       return value && value[0] && value[0].size <= 2000000;
     })
-    .test("fileType", "Only JPG or PNG files are allowed", (value) => {
+    .test("fileType", "Only JPG or PNG files are allowed", (value, context) => {
+      if (context.parent.isEditing) return true;
       return value && ["image/jpeg", "image/png"].includes(value[0]?.type);
     }),
 });
@@ -101,37 +106,53 @@ const Form = ({ closeModal, film, titile, index }) => {
 
   useEffect(() => {
     if (film) {
+      const { Title, Year, Genre, Director, Description } = film;
       reset({
-        Title: film.Title || "",
-        Genre: film.Genre || "",
-        Year: film.Year || "",
-        Director: film.Director || "",
-        Description: film.Description || "",
+        Title: Title || "",
+        Genre: Genre || "",
+        Year: Year || "",
+        Director: Director || "",
+        Description: Description || "",
+        photo: film.photo || "",
+        isEditing: Boolean(film),
       });
       setPhoto(film.photo || null);
-      setValue("Photo", film.photo || null);
+      setValue("photo", film.photo || null);
     }
   }, [film, reset, setValue]);
+
+  const [films, setFilms] = useState([]);
+
+  useEffect(() => {
+    const filmData = localStorage.getItem("filmData");
+    if (filmData) {
+      setFilms(JSON.parse(filmData));
+    }
+  }, []);
+
+  const saveFilms = (films) => {
+    localStorage.setItem("filmData", JSON.stringify(films));
+  };
+
+  const reloadPage = () => {
+    window.location.reload();
+  };
 
   const onSubmit = (data) => {
     const photoData = {
       ...data,
       photo: photo,
     };
-
-    const filmData = localStorage.getItem("filmData");
-    const storedFilms = filmData ? JSON.parse(filmData) : [];
-
+    const storedFilms = [...films];
     if (film) {
       storedFilms[index] = { ...storedFilms[index], ...photoData };
     } else {
       storedFilms.push(photoData);
     }
-
-    localStorage.setItem("filmData", JSON.stringify(storedFilms));
-    window.location.reload();
+    saveFilms(storedFilms);
     reset();
     closeModal();
+    reloadPage();
   };
 
   const handleFileChange = useCallback(
@@ -170,17 +191,15 @@ const Form = ({ closeModal, film, titile, index }) => {
   const handleReset = useCallback(() => {
     reset();
     setPhoto(null);
-    localStorage.removeItem("fileBase64");
   }, [reset]);
 
   const handleDelete = useCallback(() => {
-    const filmData = localStorage.getItem("filmData");
-    const storedFilms = filmData ? JSON.parse(filmData) : [];
+    const storedFilms = [...films];
     const updatedFilms = storedFilms.filter((_, idx) => idx !== index);
-    localStorage.setItem("filmData", JSON.stringify(updatedFilms));
+    saveFilms(updatedFilms);
     closeModal();
-    window.location.reload();
-  }, [closeModal, index]);
+    reloadPage();
+  }, [closeModal, index, films]);
 
   return (
     <form className={s.root} onSubmit={handleSubmit(onSubmit)}>
@@ -198,11 +217,11 @@ const Form = ({ closeModal, film, titile, index }) => {
         ))}
       </div>
       <div className={s.btnsBlock}>
-        <Button type={"submit"} value={"Save"} />
+        <Button type="submit" value="Save" />
         {film ? (
-          <Button type={"reset"} value={"Delete"} btnFunc={handleDelete} />
+          <Button type="reset" value="Delete" btnFunc={handleDelete} />
         ) : (
-          <Button type={"reset"} value={"Reset"} btnFunc={handleReset} />
+          <Button type="reset" value="Reset" btnFunc={handleReset} />
         )}
       </div>
     </form>

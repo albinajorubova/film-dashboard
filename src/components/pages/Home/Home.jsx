@@ -30,7 +30,7 @@ const Home = () => {
         active={modalActive}
         setActive={setModalActive}
         closeModal={closeModal}
-        content={<Form closeModal={closeModal} titile={"Add film"} />}
+        content={<Form closeModal={closeModal} titile="Add film" />}
       />
     </div>
   );

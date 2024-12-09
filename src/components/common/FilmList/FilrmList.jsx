@@ -59,7 +59,7 @@ const FilmList = memo(() => {
               film={selectedFilm}
               index={selectedFilm.index}
               closeModal={closeModal}
-              titile={"Edit film"}
+              titile="Edit film"
               editForm={true}
             />
           }
